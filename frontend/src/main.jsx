@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import {Provider} from "react-redux"
 import { store } from './redux/store.js'
 
-export const serverUrl="http://localhost:8005"
+export const serverUrl="https://render.com/docs/node-version"
 createRoot(document.getElementById('root')).render(
 <BrowserRouter>
 <Provider store={store}>
