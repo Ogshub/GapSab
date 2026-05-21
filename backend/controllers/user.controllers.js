@@ -17,14 +17,13 @@ try {
 export const editProfile=async (req,res)=>{
     try {
         let {name}=req.body
-        let image;
+        let updateData = {}
+        if(name) updateData.name = name
         if(req.file){
-            image=await uploadOnCloudinary(req.file.path)
+            const imageUrl = await uploadOnCloudinary(req.file.path)
+            if(imageUrl) updateData.image = imageUrl
         }
-        let user=await User.findByIdAndUpdate(req.userId,{
-           name,
-           image 
-        },{new:true})
+        let user=await User.findByIdAndUpdate(req.userId, updateData, {new:true}).select("-password")
 
         if(!user){
             return res.status(400).json({message:"user not found"})

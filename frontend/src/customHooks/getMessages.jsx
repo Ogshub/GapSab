@@ -10,6 +10,7 @@ const getMessage=()=>{
     let {userData,selectedUser}=useSelector(state=>state.user)
     useEffect(()=>{
         const fetchMessages=async ()=>{
+            if(!selectedUser?._id) return
             try {
                 let result=await axios.get(`${serverUrl}/api/message/get/${selectedUser._id}`,{withCredentials:true})
                 dispatch(setMessages(result.data))

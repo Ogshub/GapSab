@@ -6,7 +6,7 @@ import { BrowserRouter } from 'react-router-dom'
 import {Provider} from "react-redux"
 import { store } from './redux/store.js'
 
-export const serverUrl="https://render.com/docs/node-version"
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:5001"
 createRoot(document.getElementById('root')).render(
 <BrowserRouter>
 <Provider store={store}>

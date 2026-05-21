@@ -44,7 +44,7 @@ console.log(error)
     },[input])
   return (
     <div className={`lg:w-[30%] w-full h-full overflow-hidden lg:block bg-slate-200  relative ${!selectedUser?"block":"hidden"}`}>
-        <div className='w-[60px] h-[60px] mt-[10px] rounded-full overflow-hidden flex justify-center items-center bg-[#20c7ff] shadow-gray-500 text-gray-700 cursor-pointer shadow-lg fixed bottom-[20px] left-[10px]' onClick={handleLogOut}>
+        <div className='w-[60px] h-[60px] rounded-full overflow-hidden flex justify-center items-center bg-[#20c7ff] shadow-gray-500 text-gray-700 cursor-pointer shadow-lg absolute bottom-[20px] left-[20px] z-[50]' onClick={handleLogOut}>
    <BiLogOutCircle className='w-[25px] h-[25px]'/>
 </div>
 {input.length>0 && <div className='flex absolute top-[250px] bg-[white] w-full h-[500px] overflow-y-auto items-center pt-[20px] flex-col gap-[10px] z-[150] shadow-lg'>
@@ -68,14 +68,14 @@ console.log(error)
         </div> }
 
       <div className='w-full h-[300px] bg-[#20c7ff] rounded-b-[30%] shadow-gray-400 shadow-lg flex flex-col justify-center px-[20px] '>
-    <h1 className='text-white font-bold text-[25px]'>chatly</h1>
+    <h1 className='text-white font-bold text-[25px]'>GapShap</h1>
    <div className='w-full flex justify-between items-center'>
-    <h1 className='text-gray-800 font-bold text-[25px]'>Hii , {userData.name || "user"}</h1>
+    <h1 className='text-gray-800 font-bold text-[25px]'>Hii , {userData?.name || "user"}</h1>
     <div className='w-[60px] h-[60px] rounded-full overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg' onClick={()=>navigate("/profile")}>
-<img src={userData.image || dp} alt="" className='h-[100%]'/>
+<img src={userData?.image || dp} alt="" className='h-[100%]'/>
 </div>
    </div>
-   <div className='w-full  flex items-center gap-[20px] overflow-y-auto py-[18px]'>
+   <div className='w-full  flex items-center gap-[20px] overflow-x-auto py-[18px]'>
     {!search && <div className='w-[60px] h-[60px] mt-[10px] rounded-full overflow-hidden flex justify-center items-center bg-white shadow-gray-500 cursor-pointer shadow-lg' onClick={()=>setSearch(true)}>
    <IoIosSearch className='w-[25px] h-[25px]'/>
 </div>}
@@ -90,7 +90,7 @@ console.log(error)
     }
 {!search && otherUsers?.map((user)=>(
     onlineUsers?.includes(user._id) &&
-    <div className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center mt-[10px] cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
+    <div className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
     <div className='w-[60px] h-[60px]   rounded-full overflow-hidden flex justify-center items-center '>
     <img src={user.image || dp} alt="" className='h-[100%]'/>
     </div>
@@ -101,15 +101,15 @@ console.log(error)
    </div>
       </div>
 
-      <div className='w-full h-[50%] overflow-auto flex flex-col gap-[20px] items-center mt-[20px]'>
+      <div className='w-full h-[50%] overflow-auto flex flex-col gap-[15px] items-center mt-[20px] pb-[90px]'>
 {otherUsers?.map((user)=>(
-    <div className='w-[95%] h-[60px] flex items-center gap-[20px] shadow-gray-500 bg-white shadow-lg rounded-full hover:bg-[#78cae5] cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
-    <div className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center mt-[10px]'>
-    <div className='w-[60px] h-[60px]   rounded-full overflow-hidden flex justify-center items-center '>
+    <div className='w-[95%] h-[70px] min-h-[70px] flex items-center gap-[20px] px-[15px] shadow-gray-400 bg-white shadow-md rounded-full hover:bg-[#78cae5] cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
+    <div className='relative rounded-full shadow-gray-400 bg-white shadow-md flex justify-center items-center'>
+    <div className='w-[50px] h-[50px] rounded-full overflow-hidden flex justify-center items-center'>
     <img src={user.image || dp} alt="" className='h-[100%]'/>
     </div>
     {onlineUsers?.includes(user._id) &&
-    <span className='w-[12px] h-[12px] rounded-full absolute bottom-[6px] right-[-1px] bg-[#3aff20] shadow-gray-500 shadow-md'></span>}
+    <span className='w-[10px] h-[10px] rounded-full absolute bottom-[3px] right-[-1px] bg-[#3aff20] shadow-gray-400 shadow-md'></span>}
     </div>
     <h1 className='text-gray-800 font-semibold text-[20px]'>{user.name || user.userName}</h1>
     </div>

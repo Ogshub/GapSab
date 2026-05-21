@@ -18,7 +18,7 @@ function SenderMessage({image,message}) {
    {message && <span >{message}</span>}
    </div>
    <div className='w-[40px] h-[40px] rounded-full overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg ' >
-     <img src={userData.image || dp} alt="" className='h-[100%]'/>
+     <img src={userData?.image || dp} alt="" className='h-[100%]'/>
      </div>
     </div>
   )

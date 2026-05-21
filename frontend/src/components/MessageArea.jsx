@@ -85,7 +85,7 @@ return ()=>socket?.off("newMessage")
     </div> 
     }
 {selectedUser && <div className='w-full lg:w-[70%] h-[100px] fixed bottom-[20px] flex items-center justify-center '>
-      <img src={frontendImage} alt="" className='w-[80px] absolute bottom-[100px] right-[20%] rounded-lg shadow-gray-400 shadow-lg'/>
+      {frontendImage && <img src={frontendImage} alt="" className='w-[80px] absolute bottom-[100px] right-[20%] rounded-lg shadow-gray-400 shadow-lg'/>}
      <form className='w-[95%] lg:w-[70%] h-[60px] bg-[rgb(23,151,194)] shadow-gray-400 shadow-lg rounded-full flex items-center gap-[20px] px-[20px] relative' onSubmit={handleSendMessage}>
       
        <div onClick={()=>setShowPicker(prev=>!prev)}>
@@ -104,7 +104,7 @@ return ()=>socket?.off("newMessage")
      </div>}
     {!selectedUser && 
     <div className='w-full h-full flex flex-col justify-center items-center'>
-    <h1 className='text-gray-700 font-bold text-[50px]'>Welcome to Chatly</h1>
+    <h1 className='text-gray-700 font-bold text-[50px]'>Welcome to GapShap</h1>
     <span className='text-gray-700 font-semibold text-[30px]'>Chat Friendly !</span>
       </div>}
     

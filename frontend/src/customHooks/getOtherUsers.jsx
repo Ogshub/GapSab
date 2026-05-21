@@ -20,4 +20,4 @@ const getOtherUsers=()=>{
     },[userData])
 }
 
-export default getOtherUsers
+export default getOtherUsers

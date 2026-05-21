@@ -11,11 +11,19 @@ function Profile() {
     let {userData}=useSelector(state=>state.user)
     let dispatch=useDispatch()
     let navigate=useNavigate()
-let [name,setName]=useState(userData.name || "")
-let [frontendImage,setFrontendImage]=useState(userData.image || dp)
+let [name,setName]=useState(userData?.name || "")
+let [frontendImage,setFrontendImage]=useState(userData?.image || dp)
 let [backendImage,setBackendImage]=useState(null)
 let image=useRef()
 let [saving,setSaving]=useState(false)
+
+React.useEffect(() => {
+    if (userData) {
+        setName(userData.name || "")
+        setFrontendImage(userData.image || dp)
+    }
+}, [userData])
+
 const handleImage=(e)=>{
     let file=e.target.files[0]
     setBackendImage(file)
