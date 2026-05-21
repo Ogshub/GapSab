@@ -2,7 +2,9 @@ import jwt from "jsonwebtoken"
 import { clearAuthCookie } from "../utils/authCookie.js"
 const isAuth=async (req,res,next)=>{
     try {
-        let token=req.cookies.token
+        const authHeader = req.headers.authorization || ""
+        const bearerToken = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : ""
+        let token=bearerToken || req.cookies.token
         if(!token){
             return res.status(401).json({message:"Please log in to continue."})
         }

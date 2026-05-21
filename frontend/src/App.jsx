@@ -14,7 +14,7 @@ import { setOnlineUsers, setSocket } from './redux/userSlice'
 function App() {
   getCurrentUser()
   getOtherUsers()
-  let {userData,socket,onlineUsers}=useSelector(state=>state.user)
+  let {userData,socket,onlineUsers,authChecked}=useSelector(state=>state.user)
   let dispatch=useDispatch()
 
   useEffect(()=>{
@@ -43,12 +43,15 @@ function App() {
   },[userData])
 
   return (
+    authChecked ?
     <Routes>
       <Route path='/login' element={!userData?<Login/>:<Navigate to="/"/>}/>
       <Route path='/signup' element={!userData?<SignUp/>:<Navigate to="/profile"/>}/>
       <Route path='/' element={userData?<Home/>:<Navigate to="/login"/>}/>
       <Route path='/profile' element={userData?<Profile/>:<Navigate to="/signup"/>}/>
     </Routes>
+    :
+    <div className='w-full h-[100vh] bg-slate-200 flex items-center justify-center text-gray-700 text-[24px] font-semibold'>Loading...</div>
   )
 }
 

@@ -8,6 +8,7 @@ import { serverUrl, getImageUrl } from '../main';
 import axios from 'axios';
 import { setOtherUsers, setSearchData, setSelectedUser, setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { clearAuthToken, getAuthConfig } from '../utils/auth';
 function SideBar() {
     let {userData,otherUsers,selectedUser,onlineUsers,searchData} = useSelector(state=>state.user)
     let [search,setSearch]=useState(false)
@@ -16,22 +17,37 @@ let dispatch=useDispatch()
 let navigate=useNavigate()
     const handleLogOut=async ()=>{
         try {
-            let result =await axios.get(`${serverUrl}/api/auth/logout`,{withCredentials:true})
+            let result =await axios.get(`${serverUrl}/api/auth/logout`,getAuthConfig())
+clearAuthToken()
 dispatch(setUserData(null))
 dispatch(setOtherUsers(null))
+dispatch(setSelectedUser(null))
 navigate("/login")
         } catch (error) {
+            clearAuthToken()
+            dispatch(setUserData(null))
+            dispatch(setOtherUsers(null))
+            dispatch(setSelectedUser(null))
+            navigate("/login")
             console.log(error)
         }
     }
 
     const handlesearch=async ()=>{
         try {
-            let result =await axios.get(`${serverUrl}/api/user/search?query=${input}`,{withCredentials:true})
+            let result =await axios.get(`${serverUrl}/api/user/search?query=${input}`,getAuthConfig())
             dispatch(setSearchData(result.data))
            
         }
         catch(error){
+if(error?.response?.status===401){
+clearAuthToken()
+dispatch(setUserData(null))
+dispatch(setOtherUsers(null))
+dispatch(setSelectedUser(null))
+navigate("/login")
+return
+}
 console.log(error)
         }
     }

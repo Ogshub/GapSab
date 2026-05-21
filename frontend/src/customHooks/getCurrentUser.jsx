@@ -2,23 +2,35 @@ import axios from "axios"
 import { useEffect } from "react"
 import { serverUrl } from "../main"
 import { useDispatch } from "react-redux"
-import { setOtherUsers, setSelectedUser, setUserData } from "../redux/userSlice"
+import { setAuthChecked, setOtherUsers, setSelectedUser, setUserData } from "../redux/userSlice"
+import { clearAuthToken, getAuthConfig, getAuthToken } from "../utils/auth"
 
 const getCurrentUser=()=>{
     let dispatch=useDispatch()
     useEffect(()=>{
         const fetchUser=async ()=>{
+            if(!getAuthToken()){
+                dispatch(setUserData(null))
+                dispatch(setOtherUsers(null))
+                dispatch(setSelectedUser(null))
+                dispatch(setAuthChecked(true))
+                return
+            }
+
             try {
-                let result=await axios.get(`${serverUrl}/api/user/current`,{withCredentials:true})
+                let result=await axios.get(`${serverUrl}/api/user/current`,getAuthConfig())
                 dispatch(setUserData(result.data))
             } catch (error) {
                 if(error?.response?.status===401){
+                    clearAuthToken()
                     dispatch(setUserData(null))
                     dispatch(setOtherUsers(null))
                     dispatch(setSelectedUser(null))
-                    return
+                }else{
+                    console.log(error)
                 }
-                console.log(error)
+            } finally {
+                dispatch(setAuthChecked(true))
             }
         }
         fetchUser()

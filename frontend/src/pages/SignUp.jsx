@@ -2,8 +2,9 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { serverUrl } from '../main'
-import { useDispatch, useSelector } from 'react-redux'
-import { setUserData } from '../redux/userSlice'
+import { useDispatch } from 'react-redux'
+import { setAuthChecked, setUserData } from '../redux/userSlice'
+import { getAuthConfig, setAuthToken } from '../utils/auth'
 
 function SignUp() {
     let navigate=useNavigate()
@@ -18,20 +19,23 @@ let dispatch=useDispatch()
     const handleSignUp=async (e)=>{
         e.preventDefault()
         setLoading(true)
+        setErr("")
         try {
             let result =await axios.post(`${serverUrl}/api/auth/signup`,{
-userName,email,password
-            },{withCredentials:true})
-           dispatch(setUserData(result.data))
+userName:userName.trim(),email:email.trim(),password
+            },getAuthConfig())
+           setAuthToken(result.data.token)
+           dispatch(setUserData(result.data.user))
+           dispatch(setAuthChecked(true))
            navigate("/profile")
+            setUserName("")
             setEmail("")
             setPassword("")
             setLoading(false)
-            setErr("")
         } catch (error) {
             console.log(error)
             setLoading(false)
-            setErr(error?.response?.data?.message)
+            setErr(error?.response?.data?.message || "unable to create account")
         }
     }
 

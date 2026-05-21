@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { serverUrl, getImageUrl } from '../main';
 import { setSelectedUser, setUserData } from '../redux/userSlice';
+import { clearAuthToken, getAuthConfig } from '../utils/auth';
 function Profile() {
     let {userData}=useSelector(state=>state.user)
     let dispatch=useDispatch()
@@ -41,12 +42,13 @@ try {
     if(backendImage){
         formData.append("image",backendImage) 
     }
-    let result=await axios.put(`${serverUrl}/api/user/profile`,formData,{withCredentials:true})
+    let result=await axios.put(`${serverUrl}/api/user/profile`,formData,getAuthConfig())
     setSaving(false)
     dispatch(setUserData(result.data))
     navigate("/")
 } catch (error) {
     if(error?.response?.status===401){
+        clearAuthToken()
         dispatch(setUserData(null))
         dispatch(setSelectedUser(null))
         navigate("/login")
