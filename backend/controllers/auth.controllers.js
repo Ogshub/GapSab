@@ -24,7 +24,7 @@ const user=await User.create({
 
 const token=await genToken(user._id)
 
-const isProduction = process.env.NODE_ENV === "production"
+const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
 res.cookie("token",token,{
     httpOnly:true,
     maxAge:7*24*60*60*1000,
@@ -54,7 +54,7 @@ export const login=async (req,res)=>{
  
  const token=await genToken(user._id)
  
-const isProduction = process.env.NODE_ENV === "production"
+const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
  res.cookie("token",token,{
      httpOnly:true,
      maxAge:7*24*60*60*1000,
@@ -72,7 +72,7 @@ const isProduction = process.env.NODE_ENV === "production"
 
  export const logOut=async (req,res)=>{
     try {
-        const isProduction = process.env.NODE_ENV === "production"
+        const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
         res.clearCookie("token", {
             httpOnly:true,
             sameSite:isProduction?"none":"lax",
