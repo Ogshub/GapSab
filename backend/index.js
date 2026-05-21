@@ -5,11 +5,15 @@ import authRouter from "./routes/auth.routes.js"
 import cookieParser from "cookie-parser"
 dotenv.config()
 import cors from "cors"
+import path from "path"
+import { fileURLToPath } from "url"
 import userRouter from "./routes/user.routes.js"
 import messageRouter from "./routes/message.routes.js"
 import { app, server } from "./socket/socket.js"
 
 const port=process.env.PORT || 5000
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 
 app.use(cors({
@@ -22,6 +26,7 @@ app.use(cors({
 
 app.use(express.json())
 app.use(cookieParser())
+app.use("/public",express.static(path.join(__dirname,"public")))
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)
 app.use("/api/message",messageRouter)

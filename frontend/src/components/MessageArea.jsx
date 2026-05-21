@@ -67,7 +67,7 @@ return ()=>socket?.off("newMessage")
                   <IoIosArrowRoundBack className='w-[40px] h-[40px] text-white'/>
            </div>
          <div className='w-[50px] h-[50px] rounded-full overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg' >
-        <img src={ selectedUser?.image || dp} alt="" className='h-[100%]'/>
+        <img src={getImageUrl(selectedUser?.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
         </div>
         <h1 className='text-white font-semibold text-[20px]'>{selectedUser?.name || "user"}</h1>
     </div>
