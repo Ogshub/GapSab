@@ -2,35 +2,77 @@ import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import path from "path";
 
-const uploadOnCloudinary = async (filePath) => {
-    const absolutePath = path.resolve(filePath);
-    const fallbackImagePath = `/public/${path.basename(absolutePath)}`;
-    const hasCloudinaryConfig = Boolean(
-        process.env.CLOUD_NAME && process.env.API_KEY && process.env.API_SECRET
-    );
+const hasCloudinaryConfig = Boolean(
+    process.env.CLOUD_NAME && process.env.API_KEY && process.env.API_SECRET
+);
 
-    if (!hasCloudinaryConfig) {
-        return fallbackImagePath;
-    }
-
+if (hasCloudinaryConfig) {
     cloudinary.config({
         cloud_name: process.env.CLOUD_NAME,
         api_key: process.env.API_KEY,
         api_secret: process.env.API_SECRET
     });
+}
 
+const removeTempFile = (filePath) => {
+    if (!filePath) return;
+
+    const absolutePath = path.resolve(filePath);
     try {
-        const uploadResult = await cloudinary.uploader.upload(absolutePath);
-        try {
-            fs.unlinkSync(absolutePath);
-        } catch (e) {
-            console.log("Temp file cleanup error:", e.message);
-        }
-        return uploadResult.secure_url;
+        fs.unlinkSync(absolutePath);
     } catch (error) {
-        console.log("Cloudinary upload error:", error.message || error);
-        return fallbackImagePath;
+        console.log("Temp file cleanup error:", error.message);
     }
 };
 
-export default uploadOnCloudinary;
+const ensureCloudinaryConfig = () => {
+    if (!hasCloudinaryConfig) {
+        throw new Error("Cloudinary is not configured");
+    }
+};
+
+export const uploadOnCloudinary = async (filePath, folder = "gapsab") => {
+    if (!filePath) {
+        throw new Error("Image file path is required");
+    }
+
+    const absolutePath = path.resolve(filePath);
+
+    if (!hasCloudinaryConfig) {
+        removeTempFile(absolutePath);
+        throw new Error("Cloudinary is not configured");
+    }
+
+    try {
+        const uploadResult = await cloudinary.uploader.upload(absolutePath, {
+            folder,
+            resource_type: "image"
+        });
+
+        return {
+            url: uploadResult.secure_url,
+            publicId: uploadResult.public_id
+        };
+    } catch (error) {
+        console.log("Cloudinary upload error:", error.message || error);
+        throw error;
+    } finally {
+        removeTempFile(absolutePath);
+    }
+};
+
+export const deleteFromCloudinary = async (publicId) => {
+    if (!publicId) return null;
+
+    ensureCloudinaryConfig();
+
+    try {
+        return await cloudinary.uploader.destroy(publicId, {
+            invalidate: true,
+            resource_type: "image"
+        });
+    } catch (error) {
+        console.log("Cloudinary delete error:", error.message || error);
+        throw error;
+    }
+};

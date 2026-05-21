@@ -17,6 +17,10 @@ message:{
 image:{
     type:String,
     default:""
+},
+imagePublicId:{
+    type:String,
+    default:""
 }
 
 

@@ -11,7 +11,7 @@ import SenderMessage from './SenderMessage';
 import ReceiverMessage from './ReceiverMessage';
 import axios from 'axios';
 import { serverUrl, getImageUrl } from '../main';
-import { setMessages } from '../redux/messageSlice';
+import { addMessage, removeMessage } from '../redux/messageSlice';
 import { clearAuthToken, getAuthConfig } from '../utils/auth';
 function MessageArea() {
   let {selectedUser,userData,socket}=useSelector(state=>state.user)
@@ -20,6 +20,7 @@ function MessageArea() {
 let [input,setInput]=useState("")
 let [frontendImage,setFrontendImage]=useState(null)
 let [backendImage,setBackendImage]=useState(null)
+let [deletingMessageId,setDeletingMessageId]=useState("")
 let image=useRef()
 let {messages}=useSelector(state=>state.message)
 const handleImage=(e)=>{
@@ -39,10 +40,13 @@ const handleSendMessage=async (e)=>{
       formData.append("image",backendImage)
     }
     let result=await axios.post(`${serverUrl}/api/message/send/${selectedUser._id}`,formData,getAuthConfig())
-    dispatch(setMessages([...messages,result.data]))
+    dispatch(addMessage(result.data))
     setInput("")
     setFrontendImage(null)
     setBackendImage(null)
+    if(image.current){
+      image.current.value=""
+    }
   } catch (error) {
     if(error?.response?.status===401){
       clearAuthToken()
@@ -50,16 +54,40 @@ const handleSendMessage=async (e)=>{
     console.log(error)
   }
 }
+const handleDeleteMessage=async (messageId)=>{
+  try {
+    setDeletingMessageId(messageId)
+    await axios.delete(`${serverUrl}/api/message/${messageId}`,getAuthConfig())
+    dispatch(removeMessage(messageId))
+  } catch (error) {
+    if(error?.response?.status===401){
+      clearAuthToken()
+    }
+    console.log(error)
+  } finally {
+    setDeletingMessageId("")
+  }
+}
   const onEmojiClick =(emojiData)=>{
  setInput(prevInput=>prevInput+emojiData.emoji)
  setShowPicker(false)
   }
 useEffect(()=>{
-socket?.on("newMessage",(mess)=>{
-  dispatch(setMessages([...messages,mess]))
-})
-return ()=>socket?.off("newMessage")
-},[messages,setMessages])
+  const handleNewMessage=(mess)=>{
+    dispatch(addMessage(mess))
+  }
+
+  const handleDeletedMessage=({messageId})=>{
+    dispatch(removeMessage(messageId))
+  }
+
+socket?.on("newMessage",handleNewMessage)
+socket?.on("messageDeleted",handleDeletedMessage)
+return ()=>{
+  socket?.off("newMessage",handleNewMessage)
+  socket?.off("messageDeleted",handleDeletedMessage)
+}
+},[socket,dispatch])
  
   return (
     <div className={`lg:w-[70%] relative   ${selectedUser?"flex":"hidden"} lg:flex  w-full h-full bg-slate-200 border-l-2 border-gray-300 overflow-hidden`}>
@@ -81,7 +109,15 @@ return ()=>socket?.off("newMessage")
 {showPicker && <div className='absolute bottom-[120px] left-[20px]'><EmojiPicker width={250} height={350} className='shadow-lg z-[100]' onEmojiClick={onEmojiClick}/></div> }
 
 {messages && messages.map((mess)=>(
-  mess.sender==userData._id?<SenderMessage image={mess.image} message={mess.message}/>:<ReceiverMessage image={mess.image} message={mess.message}/>
+  mess.sender==userData._id?
+  <SenderMessage
+    key={mess._id}
+    image={mess.image}
+    message={mess.message}
+    onDelete={()=>handleDeleteMessage(mess._id)}
+    isDeleting={deletingMessageId===mess._id}
+  />:
+  <ReceiverMessage key={mess._id} image={mess.image} message={mess.message}/>
 ))}
  
 

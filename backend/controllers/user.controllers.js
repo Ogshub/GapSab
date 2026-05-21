@@ -1,4 +1,4 @@
-import uploadOnCloudinary from "../config/cloudinary.js"
+import { deleteFromCloudinary, uploadOnCloudinary } from "../config/cloudinary.js"
 import User from "../models/user.model.js"
 import { clearAuthCookie } from "../utils/authCookie.js"
 
@@ -22,7 +22,7 @@ try {
 
 export const editProfile=async (req,res)=>{
     try {
-        const existingUser = await User.findById(req.userId).select("_id")
+        const existingUser = await User.findById(req.userId).select("_id imagePublicId")
         if(!existingUser){
             return clearSessionAndRespond(req, res)
         }
@@ -31,8 +31,17 @@ export const editProfile=async (req,res)=>{
         let updateData = {}
         if(name) updateData.name = name
         if(req.file){
-            const imageUrl = await uploadOnCloudinary(req.file.path)
-            if(imageUrl) updateData.image = imageUrl
+            const uploadResult = await uploadOnCloudinary(req.file.path, "gapsab/profile-images")
+            updateData.image = uploadResult.url
+            updateData.imagePublicId = uploadResult.publicId
+
+            if(existingUser.imagePublicId){
+                try {
+                    await deleteFromCloudinary(existingUser.imagePublicId)
+                } catch (error) {
+                    console.log("Previous profile image delete error:", error.message || error)
+                }
+            }
         }
         let user=await User.findByIdAndUpdate(req.userId, updateData, {new:true}).select("-password")
 
@@ -42,6 +51,9 @@ export const editProfile=async (req,res)=>{
 
         return res.status(200).json(user)
     } catch (error) {
+        if(req.file){
+            return res.status(500).json({message:"profile image upload failed"})
+        }
         return res.status(500).json({message:`profile error ${error}`})
     }
 }
