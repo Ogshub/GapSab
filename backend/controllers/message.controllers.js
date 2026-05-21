@@ -50,9 +50,9 @@ if(receiverSocketId){
     
     } catch (error) {
         if(req.file){
-            return res.status(500).json({message:"message image upload failed"})
+            return res.status(500).json({message:`message image upload failed: ${error.message || error}`})
         }
-        return res.status(500).json({message:`send Message error ${error}`})
+        return res.status(500).json({message:`send Message error ${error.message || error}`})
     }
 }
 

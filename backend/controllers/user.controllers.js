@@ -52,9 +52,9 @@ export const editProfile=async (req,res)=>{
         return res.status(200).json(user)
     } catch (error) {
         if(req.file){
-            return res.status(500).json({message:"profile image upload failed"})
+            return res.status(500).json({message:`profile image upload failed: ${error.message || error}`})
         }
-        return res.status(500).json({message:`profile error ${error}`})
+        return res.status(500).json({message:`profile error ${error.message || error}`})
     }
 }
 
