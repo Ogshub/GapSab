@@ -10,7 +10,7 @@ import EmojiPicker from 'emoji-picker-react';
 import SenderMessage from './SenderMessage';
 import ReceiverMessage from './ReceiverMessage';
 import axios from 'axios';
-import { serverUrl } from '../main';
+import { serverUrl, getImageUrl } from '../main';
 import { setMessages } from '../redux/messageSlice';
 function MessageArea() {
   let {selectedUser,userData,socket}=useSelector(state=>state.user)

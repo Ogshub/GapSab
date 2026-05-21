@@ -4,7 +4,7 @@ import dp from "../assets/dp.webp"
 import { IoIosSearch } from "react-icons/io";
 import { RxCross2 } from "react-icons/rx";
 import { BiLogOutCircle } from "react-icons/bi";
-import { serverUrl } from '../main';
+import { serverUrl, getImageUrl } from '../main';
 import axios from 'axios';
 import { setOtherUsers, setSearchData, setSelectedUser, setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +57,7 @@ console.log(error)
         }>
      <div className='relative rounded-full bg-white  flex justify-center items-center '>
      <div className='w-[60px] h-[60px]   rounded-full overflow-hidden flex justify-center items-center '>
-     <img src={user.image || dp} alt="" className='h-[100%]'/>
+     <img src={getImageUrl(user.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
      </div>
      {onlineUsers?.includes(user._id) &&
      <span className='w-[12px] h-[12px] rounded-full absolute bottom-[6px] right-[-1px] bg-[#3aff20] shadow-gray-500 shadow-md'></span>}
@@ -72,7 +72,7 @@ console.log(error)
    <div className='w-full flex justify-between items-center'>
     <h1 className='text-gray-800 font-bold text-[25px]'>Hii , {userData?.name || "user"}</h1>
     <div className='w-[60px] h-[60px] rounded-full overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg' onClick={()=>navigate("/profile")}>
-<img src={userData?.image || dp} alt="" className='h-[100%]'/>
+<img src={getImageUrl(userData?.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
 </div>
    </div>
    <div className='w-full  flex items-center gap-[20px] overflow-x-auto py-[18px]'>
@@ -92,7 +92,7 @@ console.log(error)
     onlineUsers?.includes(user._id) &&
     <div className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
     <div className='w-[60px] h-[60px]   rounded-full overflow-hidden flex justify-center items-center '>
-    <img src={user.image || dp} alt="" className='h-[100%]'/>
+    <img src={getImageUrl(user.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
     </div>
     <span className='w-[12px] h-[12px] rounded-full absolute bottom-[6px] right-[-1px] bg-[#3aff20] shadow-gray-500 shadow-md'></span>
     </div>
@@ -106,7 +106,7 @@ console.log(error)
     <div className='w-[95%] h-[70px] min-h-[70px] flex items-center gap-[20px] px-[15px] shadow-gray-400 bg-white shadow-md rounded-full hover:bg-[#78cae5] cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
     <div className='relative rounded-full shadow-gray-400 bg-white shadow-md flex justify-center items-center'>
     <div className='w-[50px] h-[50px] rounded-full overflow-hidden flex justify-center items-center'>
-    <img src={user.image || dp} alt="" className='h-[100%]'/>
+    <img src={getImageUrl(user.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
     </div>
     {onlineUsers?.includes(user._id) &&
     <span className='w-[10px] h-[10px] rounded-full absolute bottom-[3px] right-[-1px] bg-[#3aff20] shadow-gray-400 shadow-md'></span>}

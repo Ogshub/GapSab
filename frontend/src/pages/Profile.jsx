@@ -5,14 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { serverUrl } from '../main';
+import { serverUrl, getImageUrl } from '../main';
 import { setUserData } from '../redux/userSlice';
 function Profile() {
     let {userData}=useSelector(state=>state.user)
     let dispatch=useDispatch()
     let navigate=useNavigate()
 let [name,setName]=useState(userData?.name || "")
-let [frontendImage,setFrontendImage]=useState(userData?.image || dp)
+let [frontendImage,setFrontendImage]=useState(getImageUrl(userData?.image) || dp)
 let [backendImage,setBackendImage]=useState(null)
 let image=useRef()
 let [saving,setSaving]=useState(false)
@@ -20,7 +20,7 @@ let [saving,setSaving]=useState(false)
 React.useEffect(() => {
     if (userData) {
         setName(userData.name || "")
-        setFrontendImage(userData.image || dp)
+        setFrontendImage(getImageUrl(userData.image) || dp)
     }
 }, [userData])
 
@@ -57,7 +57,7 @@ try {
         </div>
      <div className=' bg-white rounded-full border-4 border-[#20c7ff] shadow-gray-400 shadow-lg  relative' onClick={()=>image.current.click()}>
 <div className='w-[200px] h-[200px] rounded-full overflow-hidden flex justify-center items-center'>
-<img src={frontendImage} alt="" className='h-[100%]'/>
+<img src={frontendImage} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
 </div>
 <div className='absolute bottom-4  text-gray-700 right-4 w-[35px] h-[35px] rounded-full bg-[#20c7ff] flex justify-center items-center shadow-gray-400 shadow-lg'>
 <IoCameraOutline className=' text-gray-700  w-[25px] h-[25px]'/>
