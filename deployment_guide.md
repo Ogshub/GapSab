@@ -55,11 +55,11 @@ Instead, deploy the **Backend Server** to a persistent hosting provider like **R
    - **Start Command**: `npm start` (Runs `node index.js`)
 5. Click **Advanced** and add the following **Environment Variables**:
    - `PORT`: `10000` (or leave blank; Render sets this automatically)
-   - `MONGO_URI`: `your_mongodb_atlas_connection_string`
+   - `MONGODB_URL`: `your_mongodb_atlas_connection_string`
    - `JWT_SECRET`: `your_secure_random_string`
-   - `CLOUDINARY_CLOUD_NAME`: `your_cloudinary_cloud_name`
-   - `CLOUDINARY_API_KEY`: `your_cloudinary_api_key`
-   - `CLOUDINARY_API_SECRET`: `your_cloudinary_api_secret`
+   - `CLOUD_NAME`: `your_cloudinary_cloud_name`
+   - `API_KEY`: `your_cloudinary_api_key`
+   - `API_SECRET`: `your_cloudinary_api_secret`
    - `FRONTEND_URL`: `https://your-frontend-domain.vercel.app` (The URL where your frontend will be deployed, e.g., on Vercel)
 6. Click **Deploy Web Service**.
 7. **Copy the backend URL** once deployed (e.g., `https://gapsab-backend.onrender.com`).
