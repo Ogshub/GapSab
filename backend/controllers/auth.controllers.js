@@ -1,6 +1,7 @@
 import genToken from "../config/token.js"
 import User from "../models/user.model.js"
 import bcrypt from "bcryptjs"
+import { clearAuthCookie, getAuthCookieOptions } from "../utils/authCookie.js"
 export const signUp=async (req,res)=>{
    try {
     const {userName,email,password}=req.body
@@ -24,12 +25,9 @@ const user=await User.create({
 
 const token=await genToken(user._id)
 
-const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
 res.cookie("token",token,{
-    httpOnly:true,
     maxAge:7*24*60*60*1000,
-    sameSite:isProduction?"none":"lax",
-    secure:isProduction
+    ...getAuthCookieOptions(req)
    })
 
    return res.status(201).json(user)
@@ -52,14 +50,11 @@ export const login=async (req,res)=>{
     return res.status(400).json({message:"incorrect password"})
  }
  
- const token=await genToken(user._id)
+const token=await genToken(user._id)
  
-const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
  res.cookie("token",token,{
-     httpOnly:true,
      maxAge:7*24*60*60*1000,
-     sameSite:isProduction?"none":"lax",
-     secure:isProduction
+     ...getAuthCookieOptions(req)
     })
  
     return res.status(200).json(user)
@@ -72,12 +67,7 @@ const isProduction = process.env.NODE_ENV === "production" || (req.get("origin")
 
  export const logOut=async (req,res)=>{
     try {
-        const isProduction = process.env.NODE_ENV === "production" || (req.get("origin") && !req.get("origin").includes("localhost"))
-        res.clearCookie("token", {
-            httpOnly:true,
-            sameSite:isProduction?"none":"lax",
-            secure:isProduction
-        })
+        clearAuthCookie(req, res)
         return res.status(200).json({message:"log out successfully"})
     } catch (error) {
         return res.status(500).json({message:`logout error ${error}`})

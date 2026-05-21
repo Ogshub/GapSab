@@ -6,7 +6,7 @@ import { IoIosArrowRoundBack } from "react-icons/io";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { serverUrl, getImageUrl } from '../main';
-import { setUserData } from '../redux/userSlice';
+import { setSelectedUser, setUserData } from '../redux/userSlice';
 function Profile() {
     let {userData}=useSelector(state=>state.user)
     let dispatch=useDispatch()
@@ -46,7 +46,13 @@ try {
     dispatch(setUserData(result.data))
     navigate("/")
 } catch (error) {
-    console.log(error)
+    if(error?.response?.status===401){
+        dispatch(setUserData(null))
+        dispatch(setSelectedUser(null))
+        navigate("/login")
+    }else{
+        console.log(error)
+    }
     setSaving(false)
 }
 }

@@ -1,11 +1,17 @@
 import uploadOnCloudinary from "../config/cloudinary.js"
 import User from "../models/user.model.js"
+import { clearAuthCookie } from "../utils/authCookie.js"
+
+const clearSessionAndRespond = (req, res) => {
+    clearAuthCookie(req, res)
+    return res.status(401).json({message:"Session expired. Please log in again."})
+}
 
 export const getCurrentUser=async (req,res)=>{
 try {
     let user=await User.findById(req.userId).select("-password")
     if(!user){
-        return res.status(400).json({message:"user not found"})
+        return clearSessionAndRespond(req, res)
     }
 
     return res.status(200).json(user)
@@ -16,6 +22,11 @@ try {
 
 export const editProfile=async (req,res)=>{
     try {
+        const existingUser = await User.findById(req.userId).select("_id")
+        if(!existingUser){
+            return clearSessionAndRespond(req, res)
+        }
+
         let {name}=req.body
         let updateData = {}
         if(name) updateData.name = name
@@ -26,7 +37,7 @@ export const editProfile=async (req,res)=>{
         let user=await User.findByIdAndUpdate(req.userId, updateData, {new:true}).select("-password")
 
         if(!user){
-            return res.status(400).json({message:"user not found"})
+            return clearSessionAndRespond(req, res)
         }
 
         return res.status(200).json(user)
@@ -37,6 +48,11 @@ export const editProfile=async (req,res)=>{
 
 export const getOtherUsers=async (req,res)=>{
     try {
+        const existingUser = await User.findById(req.userId).select("_id")
+        if(!existingUser){
+            return clearSessionAndRespond(req, res)
+        }
+
         let users=await User.find({
             _id:{$ne:req.userId}
         }).select("-password")
@@ -48,6 +64,11 @@ export const getOtherUsers=async (req,res)=>{
 
 export const search =async (req,res)=>{
     try {
+        const existingUser = await User.findById(req.userId).select("_id")
+        if(!existingUser){
+            return clearSessionAndRespond(req, res)
+        }
+
         let {query}=req.query
         if(!query){
             return res.status(400).json({message:"query is required"})
