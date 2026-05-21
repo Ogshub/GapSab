@@ -54,6 +54,7 @@ try {
         navigate("/login")
     }else{
         console.log(error)
+        alert(error?.response?.data?.message || error?.message || "Failed to save profile. Please check your network and configuration.")
     }
     setSaving(false)
 }
