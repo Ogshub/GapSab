@@ -4,6 +4,7 @@ import { serverUrl } from "../main"
 import { useDispatch } from "react-redux"
 import { setAuthChecked, setOtherUsers, setSelectedUser, setUserData } from "../redux/userSlice"
 import { clearAuthToken, getAuthConfig, getAuthToken } from "../utils/auth"
+import { clearStoredSelectedUserId } from "../utils/selectedUser"
 
 const getCurrentUser=()=>{
     let dispatch=useDispatch()
@@ -13,6 +14,7 @@ const getCurrentUser=()=>{
                 dispatch(setUserData(null))
                 dispatch(setOtherUsers(null))
                 dispatch(setSelectedUser(null))
+                clearStoredSelectedUserId()
                 dispatch(setAuthChecked(true))
                 return
             }
@@ -26,6 +28,7 @@ const getCurrentUser=()=>{
                     dispatch(setUserData(null))
                     dispatch(setOtherUsers(null))
                     dispatch(setSelectedUser(null))
+                    clearStoredSelectedUserId()
                 }else{
                     console.log(error)
                 }

@@ -9,22 +9,28 @@ import axios from 'axios';
 import { setOtherUsers, setSearchData, setSelectedUser, setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
 import { clearAuthToken, getAuthConfig } from '../utils/auth';
+import { clearStoredSelectedUserId, setStoredSelectedUserId } from '../utils/selectedUser';
 function SideBar() {
     let {userData,otherUsers,selectedUser,onlineUsers,searchData} = useSelector(state=>state.user)
     let [search,setSearch]=useState(false)
     let [input,setInput]=useState("")
 let dispatch=useDispatch()
 let navigate=useNavigate()
+    const getUserKey = (user, index) => {
+        return user?._id || user?.email || user?.userName || `user-${index}`
+    }
     const handleLogOut=async ()=>{
         try {
             let result =await axios.get(`${serverUrl}/api/auth/logout`,getAuthConfig())
 clearAuthToken()
+clearStoredSelectedUserId()
 dispatch(setUserData(null))
 dispatch(setOtherUsers(null))
 dispatch(setSelectedUser(null))
 navigate("/login")
         } catch (error) {
             clearAuthToken()
+            clearStoredSelectedUserId()
             dispatch(setUserData(null))
             dispatch(setOtherUsers(null))
             dispatch(setSelectedUser(null))
@@ -64,8 +70,9 @@ console.log(error)
    <BiLogOutCircle className='w-[25px] h-[25px]'/>
 </div>
 {input.length>0 && <div className='flex absolute top-[250px] bg-[white] w-full h-[500px] overflow-y-auto items-center pt-[20px] flex-col gap-[10px] z-[150] shadow-lg'>
-{searchData?.map((user)=>(
-     <div className='w-[95%] h-[70px] flex items-center gap-[20px]  px-[10px] hover:bg-[#78cae5] border-b-2 border-gray-400 cursor-pointer' onClick={()=>{
+{searchData?.map((user,index)=>(
+     <div key={getUserKey(user, index)} className='w-[95%] h-[70px] flex items-center gap-[20px]  px-[10px] hover:bg-[#78cae5] border-b-2 border-gray-400 cursor-pointer' onClick={()=>{
+        setStoredSelectedUserId(user._id)
         dispatch(setSelectedUser(user))
         setInput("")
         setSearch(false)
@@ -104,9 +111,11 @@ console.log(error)
      
     </form>
     }
-{!search && otherUsers?.map((user)=>(
-    onlineUsers?.includes(user._id) &&
-    <div className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
+{!search && otherUsers?.filter(user => onlineUsers?.includes(user._id)).map((user, index)=>(
+    <div key={getUserKey(user, index)} className='relative rounded-full shadow-gray-500 bg-white shadow-lg flex justify-center items-center cursor-pointer' onClick={()=>{
+      setStoredSelectedUserId(user._id)
+      dispatch(setSelectedUser(user))
+    }}>
     <div className='w-[60px] h-[60px]   rounded-full overflow-hidden flex justify-center items-center '>
     <img src={getImageUrl(user.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>
     </div>
@@ -118,8 +127,11 @@ console.log(error)
       </div>
 
       <div className='w-full h-[50%] overflow-auto flex flex-col gap-[15px] items-center mt-[20px] pb-[90px]'>
-{otherUsers?.map((user)=>(
-    <div className='w-[95%] h-[70px] min-h-[70px] flex items-center gap-[20px] px-[15px] shadow-gray-400 bg-white shadow-md rounded-full hover:bg-[#78cae5] cursor-pointer' onClick={()=>dispatch(setSelectedUser(user))}>
+{otherUsers?.map((user,index)=>(
+    <div key={getUserKey(user, index)} className='w-[95%] h-[70px] min-h-[70px] flex items-center gap-[20px] px-[15px] shadow-gray-400 bg-white shadow-md rounded-full hover:bg-[#78cae5] cursor-pointer' onClick={()=>{
+      setStoredSelectedUserId(user._id)
+      dispatch(setSelectedUser(user))
+    }}>
     <div className='relative rounded-full shadow-gray-400 bg-white shadow-md flex justify-center items-center'>
     <div className='w-[50px] h-[50px] rounded-full overflow-hidden flex justify-center items-center'>
     <img src={getImageUrl(user.image) || dp} alt="" className='w-full h-full object-cover' onError={(e) => { e.target.src = dp; }}/>

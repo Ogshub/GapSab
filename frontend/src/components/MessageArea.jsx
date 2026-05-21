@@ -13,6 +13,7 @@ import axios from 'axios';
 import { serverUrl, getImageUrl } from '../main';
 import { addMessage, removeMessage } from '../redux/messageSlice';
 import { clearAuthToken, getAuthConfig } from '../utils/auth';
+import { clearStoredSelectedUserId } from '../utils/selectedUser';
 function MessageArea() {
   let {selectedUser,userData,socket}=useSelector(state=>state.user)
   let dispatch=useDispatch()
@@ -23,6 +24,9 @@ let [backendImage,setBackendImage]=useState(null)
 let [deletingMessageId,setDeletingMessageId]=useState("")
 let image=useRef()
 let {messages}=useSelector(state=>state.message)
+const getMessageKey = (message, index) => {
+  return message?._id || `${message?.sender || "sender"}-${message?.receiver || "receiver"}-${message?.createdAt || index}-${index}`
+}
 const handleImage=(e)=>{
   let file=e.target.files[0]
   setBackendImage(file)
@@ -95,7 +99,10 @@ return ()=>{
 {selectedUser && 
 <div className='w-full h-[100vh] flex flex-col overflow-hidden gap-[20px] items-center'>
 <div className='w-full h-[100px] bg-[#1797c2] rounded-b-[30px] shadow-gray-400 shadow-lg gap-[20px] flex items-center px-[20px] '>
-           <div className='cursor-pointer' onClick={()=>dispatch(setSelectedUser(null))}>
+           <div className='cursor-pointer' onClick={()=>{
+            clearStoredSelectedUserId()
+            dispatch(setSelectedUser(null))
+           }}>
                   <IoIosArrowRoundBack className='w-[40px] h-[40px] text-white'/>
            </div>
          <div className='w-[50px] h-[50px] rounded-full overflow-hidden flex justify-center items-center bg-white cursor-pointer shadow-gray-500 shadow-lg' >
@@ -108,16 +115,16 @@ return ()=>{
 
 {showPicker && <div className='absolute bottom-[120px] left-[20px]'><EmojiPicker width={250} height={350} className='shadow-lg z-[100]' onEmojiClick={onEmojiClick}/></div> }
 
-{messages && messages.map((mess)=>(
+{messages && messages.map((mess,index)=>(
   mess.sender==userData._id?
   <SenderMessage
-    key={mess._id}
+    key={getMessageKey(mess, index)}
     image={mess.image}
     message={mess.message}
     onDelete={()=>handleDeleteMessage(mess._id)}
     isDeleting={deletingMessageId===mess._id}
   />:
-  <ReceiverMessage key={mess._id} image={mess.image} message={mess.message}/>
+  <ReceiverMessage key={getMessageKey(mess, index)} image={mess.image} message={mess.message}/>
 ))}
  
 

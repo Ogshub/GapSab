@@ -1,34 +1,37 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const hasCloudinaryConfig = Boolean(
-    process.env.CLOUD_NAME && process.env.API_KEY && process.env.API_SECRET
-);
-
-if (hasCloudinaryConfig) {
-    cloudinary.config({
-        cloud_name: process.env.CLOUD_NAME,
-        api_key: process.env.API_KEY,
-        api_secret: process.env.API_SECRET
-    });
-}
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const removeTempFile = (filePath) => {
     if (!filePath) return;
 
     const absolutePath = path.resolve(filePath);
     try {
-        fs.unlinkSync(absolutePath);
+        if (fs.existsSync(absolutePath)) {
+            fs.unlinkSync(absolutePath);
+        }
     } catch (error) {
         console.log("Temp file cleanup error:", error.message);
     }
 };
 
-const ensureCloudinaryConfig = () => {
+const configureCloudinary = () => {
+    const hasCloudinaryConfig = Boolean(
+        process.env.CLOUD_NAME && process.env.API_KEY && process.env.API_SECRET
+    );
+
     if (!hasCloudinaryConfig) {
         throw new Error("Cloudinary is not configured");
     }
+
+    cloudinary.config({
+        cloud_name: process.env.CLOUD_NAME,
+        api_key: process.env.API_KEY,
+        api_secret: process.env.API_SECRET
+    });
 };
 
 export const uploadOnCloudinary = async (filePath, folder = "gapsab") => {
@@ -38,12 +41,9 @@ export const uploadOnCloudinary = async (filePath, folder = "gapsab") => {
 
     const absolutePath = path.resolve(filePath);
 
-    if (!hasCloudinaryConfig) {
-        removeTempFile(absolutePath);
-        throw new Error("Cloudinary is not configured");
-    }
-
     try {
+        configureCloudinary();
+
         const uploadResult = await cloudinary.uploader.upload(absolutePath, {
             folder,
             resource_type: "image"
@@ -64,7 +64,7 @@ export const uploadOnCloudinary = async (filePath, folder = "gapsab") => {
 export const deleteFromCloudinary = async (publicId) => {
     if (!publicId) return null;
 
-    ensureCloudinaryConfig();
+    configureCloudinary();
 
     try {
         return await cloudinary.uploader.destroy(publicId, {
